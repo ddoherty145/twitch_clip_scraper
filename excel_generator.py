@@ -8,7 +8,7 @@ def create_clips_excel(clips_data, filename=None):
 
     if not filename:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f'clips_output/top_twitch_clips_{timestamp()}.xlsx'
+        filename = f'clips_output/top_twitch_clips_{timestamp}.xlsx'
 
     #Create workbook and sheet
     wb = Workbook()
@@ -52,11 +52,11 @@ def create_clips_excel(clips_data, filename=None):
                     max_length = len(str(cell.value))
             except:
                 pass
-        adjusted_width = (max_length + 2, 50)
-        ws.column_dimensions[column_letter].width = adjusted_width
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column].width = adjusted_width
 
     #Save File
-    os.makedirs(clips_output, exist_ok=True)
+    os.makedirs('clips_output', exist_ok=True)
     wb.save(filename)
     return filename
       

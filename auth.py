@@ -6,7 +6,7 @@ load_dotenv()
 
 def get_twitch_token():
     """OAuth token from Twitch API"""
-    client_id = os.getenv("TWTICH_CLIENT_ID")
+    client_id = os.getenv("TWITCH_CLIENT_ID")
     client_secret = os.getenv("TWITCH_CLIENT_SECRET")
 
     url = "https://id.twitch.tv/oauth2/token"

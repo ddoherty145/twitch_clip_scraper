@@ -1,4 +1,4 @@
-from auth import get_oauth_token
+from auth import get_twitch_token
 from clips_getter import get_top_clips
 from excel_generator import create_clips_excel
 import sys
@@ -7,7 +7,7 @@ def main():
     try:
         print("👾 Starting Twitch Scraper...")
         print("🔑 Getting OAuth Token...")
-        token = get_oauth_token()
+        token = get_twitch_token()
         print("✅ OAuth Token acquired.")
 
         # Get Clips
@@ -27,7 +27,8 @@ def main():
         #Display summary
         print("\n📄 Summary of Top Clips:")
         print(f"Total Clips: {len(clips)}")
-        print(f"Top clip views: {clips[0].get('view_count', 0):,}")
+        if clips:
+            print(f"Top Clip views: {clips[0].get('view_count', 0)}")
         print(f"Excel File: {excel_file}")
 
     except Exception as e:
