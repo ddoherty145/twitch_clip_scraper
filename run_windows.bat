@@ -28,7 +28,7 @@ echo 📋 Installing/updating dependencies...
 pip install -r requirements.txt
 
 REM Check if .env file exists
-if not exists ".env" (
+if not exist ".env" (
     echo ❌ .env file not found
     echo please create a .env file in the root of the project
     echo TWITCH_CLIENT_ID=your_client_id_here

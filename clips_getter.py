@@ -227,18 +227,26 @@ def get_clips_by_game(token, game_name, days_back=1, limit=15, english_only=True
             data = response.json()
             clips = data.get('data', [])
             
-            # Add proper game name to each clip
+            # Get broadcaster info for all clips to get proper channel names
+            if clips:
+                user_ids = list(set(clip.get('broadcaster_id') for clip in clips if clip.get('broadcaster_id')))
+                broadcaster_info = get_broadcaster_info(token, user_ids)
+            
+            # Add proper game name and broadcaster name to each clip
             for clip in clips:
                 clip['game_name'] = game_info['name']  # Use actual game name from API
                 clip['game_id'] = game_id
+                
+                # Add broadcaster display name (channel name)
+                broadcaster_id = clip.get('broadcaster_id')
+                if broadcaster_id and broadcaster_id in broadcaster_info:
+                    clip['broadcaster_name'] = broadcaster_info[broadcaster_id].get('display_name', clip.get('broadcaster_name', 'Unknown'))
+                else:
+                    clip['broadcaster_name'] = clip.get('broadcaster_name', 'Unknown')
             
             # Filter for English content if requested
             if english_only and clips:
-                # Get broadcaster info for language detection
-                user_ids = list(set(clip.get('creator_id') for clip in clips if clip.get('creator_id')))
-                broadcaster_info = get_broadcaster_info(token, user_ids)
-                
-                # Filter clips
+                # Use the broadcaster info we already fetched for language detection
                 english_clips = []
                 for clip in clips:
                     if is_likely_english_content(clip, broadcaster_info):
@@ -270,6 +278,7 @@ def get_top_clips(token, days_back=1, limit=50, strategy='mixed', english_only=T
     - Resolves game IDs to actual game names
     - Filters for English-speaking content
     - Enhanced language detection
+    - Adds broadcaster/channel name information
     """
     
     # Comprehensive list of popular Twitch categories
@@ -329,7 +338,8 @@ def get_top_clips(token, days_back=1, limit=50, strategy='mixed', english_only=T
                 views = best_clip.get('view_count', 0)
                 title = best_clip.get('title', 'No Title')[:40]
                 creator = best_clip.get('creator_name', 'Unknown')
-                print(f"   🏆 Best: '{title}...' by {creator} ({views:,} views)")
+                channel = best_clip.get('broadcaster_name', creator)
+                print(f"   🏆 Best: '{title}...' by {channel} ({views:,} views)")
             
             # Small delay to be respectful to the API
             time.sleep(0.5)
@@ -361,5 +371,6 @@ def get_top_clips(token, days_back=1, limit=50, strategy='mixed', english_only=T
         print(f"   👀 {top_clip.get('view_count', 0):,} views")
         print(f"   🎮 Game: {top_clip.get('game_name', 'Unknown')}")
         print(f"   👤 Creator: {top_clip.get('creator_name', 'Unknown')}")
+        print(f"   📺 Channel: {top_clip.get('broadcaster_name', 'Unknown')}")
     
     return final_clips

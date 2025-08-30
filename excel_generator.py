@@ -17,7 +17,7 @@ def create_clips_excel(clips_data, filename=None):
 
     # Define headers
     headers = [
-        "Clip Title", "URL", "Views", "Creator", "Game/Category", "Duration (s)", "Created At", "Thumbnail URL"
+        "Clip Title", "URL", "Views", "Channel/Creator", "Game/Category", "Duration (s)", "Created At", "Thumbnail URL"
     ]
 
     # Apply header styles
@@ -36,7 +36,7 @@ def create_clips_excel(clips_data, filename=None):
         ws.cell(row=row, column=1, value=clip.get('title', 'N/A'))
         ws.cell(row=row, column=2, value=clip.get('url', 'N/A'))
         ws.cell(row=row, column=3, value=clip.get('view_count', 0))
-        ws.cell(row=row, column=4, value=clip.get('creator_name', 'N/A'))
+        ws.cell(row=row, column=4, value=clip.get('broadcaster_name', clip.get('creator_name', 'N/A')))
         # CHANGED: Now uses game_name instead of game_id for readable game names
         ws.cell(row=row, column=5, value=clip.get('game_name', 'N/A'))
         ws.cell(row=row, column=6, value=clip.get('duration', 0))
