@@ -2,7 +2,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-def get_top_clips(token, days_back=1, limit=20):
+def get_top_clips(token, days_back=1, limit=50):
     """Fetch top Twitch clips from the past specified days."""
 
     client_id = os.getenv('TWITCH_CLIENT_ID')
@@ -39,5 +39,4 @@ def get_top_clips(token, days_back=1, limit=20):
         return sorted_clips
     else:
         raise Exception(f"Error fetching clips: {response.status_code} - {response.text}")
-    
     
