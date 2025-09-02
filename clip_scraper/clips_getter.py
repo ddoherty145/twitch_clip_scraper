@@ -3,6 +3,9 @@ import os
 from datetime import datetime, timedelta
 import time
 import re
+import sys
+sys.path.append('..')
+from shared.auth import get_twitch_headers, make_twitch_request
 
 # Cache for game info to avoid repeated API calls
 GAME_CACHE = {}
@@ -12,29 +15,22 @@ def get_game_info_by_name(token, game_name):
     if game_name in GAME_CACHE:
         return GAME_CACHE[game_name]
     
-    client_id = os.getenv('TWITCH_CLIENT_ID')
-    
     url = 'https://api.twitch.tv/helix/games'
-    headers = {
-        'Client-ID': client_id,
-        'Authorization': f'Bearer {token}'
-    }
     params = {'name': game_name}
     
     try:
-        response = requests.get(url, headers=headers, params=params)
-        if response.status_code == 200:
-            games = response.json().get('data', [])
-            if games:
-                game_info = {
-                    'id': games[0]['id'],
-                    'name': games[0]['name'],
-                    'box_art_url': games[0].get('box_art_url', '')
-                }
-                GAME_CACHE[game_name] = game_info
-                return game_info
+        data = make_twitch_request(url, params)
+        games = data.get('data', [])
+        if games:
+            game_info = {
+                'id': games[0]['id'],
+                'name': games[0]['name'],
+                'box_art_url': games[0].get('box_art_url', '')
+            }
+            GAME_CACHE[game_name] = game_info
+            return game_info
         else:
-            print(f"⚠️ Couldn't find game '{game_name}': {response.status_code}")
+            print(f"⚠️ Couldn't find game '{game_name}'")
             return None
     except Exception as e:
         print(f"⚠️ Error looking up game '{game_name}': {e}")
@@ -45,15 +41,7 @@ def get_games_by_ids(token, game_ids):
     if not game_ids:
         return {}
     
-    client_id = os.getenv('TWITCH_CLIENT_ID')
-    
     url = 'https://api.twitch.tv/helix/games'
-    headers = {
-        'Client-ID': client_id,
-        'Authorization': f'Bearer {token}'
-    }
-    
-    # Twitch API allows up to 100 IDs per request
     game_info = {}
     
     # Process in chunks of 100
@@ -62,16 +50,13 @@ def get_games_by_ids(token, game_ids):
         params = {'id': chunk}
         
         try:
-            response = requests.get(url, headers=headers, params=params)
-            if response.status_code == 200:
-                games = response.json().get('data', [])
-                for game in games:
-                    game_info[game['id']] = {
-                        'name': game['name'],
-                        'box_art_url': game.get('box_art_url', '')
-                    }
-            else:
-                print(f"⚠️ Error fetching game info: {response.status_code}")
+            data = make_twitch_request(url, params)
+            games = data.get('data', [])
+            for game in games:
+                game_info[game['id']] = {
+                    'name': game['name'],
+                    'box_art_url': game.get('box_art_url', '')
+                }
         except Exception as e:
             print(f"⚠️ Exception fetching game info: {e}")
         
@@ -84,14 +69,7 @@ def get_broadcaster_info(token, user_ids):
     if not user_ids:
         return {}
     
-    client_id = os.getenv('TWITCH_CLIENT_ID')
-    
     url = 'https://api.twitch.tv/helix/users'
-    headers = {
-        'Client-ID': client_id,
-        'Authorization': f'Bearer {token}'
-    }
-    
     broadcaster_info = {}
     
     # Process in chunks of 100 (API limit)
@@ -100,18 +78,15 @@ def get_broadcaster_info(token, user_ids):
         params = {'id': chunk}
         
         try:
-            response = requests.get(url, headers=headers, params=params)
-            if response.status_code == 200:
-                users = response.json().get('data', [])
-                for user in users:
-                    broadcaster_info[user['id']] = {
-                        'display_name': user.get('display_name', user.get('login', 'Unknown')),
-                        'description': user.get('description', ''),
-                        'broadcaster_type': user.get('broadcaster_type', ''),
-                        'profile_image_url': user.get('profile_image_url', '')
-                    }
-            else:
-                print(f"⚠️ Error fetching broadcaster info: {response.status_code}")
+            data = make_twitch_request(url, params)
+            users = data.get('data', [])
+            for user in users:
+                broadcaster_info[user['id']] = {
+                    'display_name': user.get('display_name', user.get('login', 'Unknown')),
+                    'description': user.get('description', ''),
+                    'broadcaster_type': user.get('broadcaster_type', ''),
+                    'profile_image_url': user.get('profile_image_url', '')
+                }
         except Exception as e:
             print(f"⚠️ Exception fetching broadcaster info: {e}")
         
@@ -189,7 +164,7 @@ def is_likely_english_content(clip, broadcaster_info=None):
     # Default: if we can't determine, include it (better to have false positives)
     return True
 
-def get_clips_by_game(token, game_name, days_back=1, limit=15, english_only=True):
+def get_clips_by_game(token, game_name, days_back=1, limit=50, english_only=True):
     """Get clips from a specific game with optional English filtering"""
     print(f"🎮 Fetching clips for: {game_name}")
     
@@ -200,7 +175,6 @@ def get_clips_by_game(token, game_name, days_back=1, limit=15, english_only=True
         return []
     
     game_id = game_info['id']
-    client_id = os.getenv('TWITCH_CLIENT_ID')
     
     # Calculate date range
     end_time = datetime.utcnow()
@@ -210,10 +184,6 @@ def get_clips_by_game(token, game_name, days_back=1, limit=15, english_only=True
     ended_at = end_time.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     url = 'https://api.twitch.tv/helix/clips'
-    headers = {
-        'Client-ID': client_id,
-        'Authorization': f'Bearer {token}'
-    }
     params = {
         'game_id': game_id,
         'started_at': started_at,
@@ -222,55 +192,47 @@ def get_clips_by_game(token, game_name, days_back=1, limit=15, english_only=True
     }
 
     try:
-        response = requests.get(url, headers=headers, params=params)
-        if response.status_code == 200:
-            data = response.json()
-            clips = data.get('data', [])
+        data = make_twitch_request(url, params)
+        clips = data.get('data', [])
+        
+        # Get broadcaster info for all clips to get proper channel names
+        if clips:
+            user_ids = list(set(clip.get('broadcaster_id') for clip in clips if clip.get('broadcaster_id')))
+            broadcaster_info = get_broadcaster_info(token, user_ids)
+        
+        # Add proper game name and broadcaster name to each clip
+        for clip in clips:
+            clip['game_name'] = game_info['name']  # Use actual game name from API
+            clip['game_id'] = game_id
             
-            # Get broadcaster info for all clips to get proper channel names
-            if clips:
-                user_ids = list(set(clip.get('broadcaster_id') for clip in clips if clip.get('broadcaster_id')))
-                broadcaster_info = get_broadcaster_info(token, user_ids)
-            
-            # Add proper game name and broadcaster name to each clip
-            for clip in clips:
-                clip['game_name'] = game_info['name']  # Use actual game name from API
-                clip['game_id'] = game_id
-                
-                # Add broadcaster display name (channel name)
-                broadcaster_id = clip.get('broadcaster_id')
-                if broadcaster_id and broadcaster_id in broadcaster_info:
-                    clip['broadcaster_name'] = broadcaster_info[broadcaster_id].get('display_name', clip.get('broadcaster_name', 'Unknown'))
-                else:
-                    clip['broadcaster_name'] = clip.get('broadcaster_name', 'Unknown')
-            
-            # Filter for English content if requested
-            if english_only and clips:
-                # Use the broadcaster info we already fetched for language detection
-                english_clips = []
-                for clip in clips:
-                    if is_likely_english_content(clip, broadcaster_info):
-                        english_clips.append(clip)
-                
-                clips = english_clips[:limit]  # Limit after filtering
-                
-                print(f"✅ {game_name}: Found {len(clips)} English clips")
+            # Add broadcaster display name (channel name)
+            broadcaster_id = clip.get('broadcaster_id')
+            if broadcaster_id and broadcaster_id in broadcaster_info:
+                clip['broadcaster_name'] = broadcaster_info[broadcaster_id].get('display_name', clip.get('broadcaster_name', 'Unknown'))
             else:
-                print(f"✅ {game_name}: Found {len(clips)} clips")
-                
-            return clips
-        elif response.status_code == 429:
-            print(f"⏱️ Rate limited, waiting 60 seconds...")
-            time.sleep(60)
-            return get_clips_by_game(token, game_name, days_back, limit, english_only)  # Retry
+                clip['broadcaster_name'] = clip.get('broadcaster_name', 'Unknown')
+        
+        # Filter for English content if requested
+        if english_only and clips:
+            # Use the broadcaster info we already fetched for language detection
+            english_clips = []
+            for clip in clips:
+                if is_likely_english_content(clip, broadcaster_info):
+                    english_clips.append(clip)
+            
+            clips = english_clips[:limit]  # Limit after filtering
+            
+            print(f"✅ {game_name}: Found {len(clips)} English clips")
         else:
-            print(f"⚠️ Error fetching clips for {game_name}: {response.status_code}")
-            return []
+            print(f"✅ {game_name}: Found {len(clips)} clips")
+            
+        return clips
+        
     except Exception as e:
         print(f"⚠️ Exception fetching clips for {game_name}: {e}")
         return []
 
-def get_top_clips(token, days_back=1, limit=50, strategy='mixed', english_only=True):
+def get_top_clips(token, days_back=1, limit=150, strategy='mixed', english_only=True):
     """
     Get top clips from multiple popular games
     

@@ -1,7 +1,8 @@
-from auth import get_twitch_token
-from clips_getter import get_top_clips
-from excel_generator import create_clips_excel
 import sys
+sys.path.append('..')
+from shared.auth import get_twitch_token
+from clip_scraper.clips_getter import get_top_clips
+from clip_scraper.excel_generator import create_clips_excel
 
 def main():
     try:
@@ -15,14 +16,15 @@ def main():
         
         print("📥 Starting multi-game clip collection...")
         print("🎯 This will search across 20+ popular game categories")
-        print("⏳ This may take 1-2 minutes due to API rate limits...")
+        print("📊 Targeting top 150 clips overall")
+        print("⏳ This may take 2-3 minutes due to API rate limits...")
         print()
         
         # Strategy 3: Multiple games approach with English filtering
         clips = get_top_clips(
             token=token, 
             days_back=1,         # Last 24 hours
-            limit=50,            # Top 50 clips overall
+            limit=150,           # Top 150 clips overall
             strategy='mixed',    # Multi-game strategy
             english_only=True    # NEW: Filter for English content only
         )
@@ -45,7 +47,7 @@ def main():
         print("📈 CLIP COLLECTION SUMMARY")
         print("=" * 60)
         
-        print(f"📊 Total Clips: {len(clips)}")
+        print(f"📊 Total Clips: {len(clips)} (targeting top 150)")
         print(f"⏰ Time Period: Last 24 hours")
         print(f"📁 Output File: {excel_file}")
         

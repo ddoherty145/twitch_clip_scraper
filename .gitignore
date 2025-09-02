@@ -211,4 +211,14 @@ clips_output/
 *.xlsx
 *.xls
 
+highlight_output/
+clips_output/
+highlight_scraper/output/
+clip_scraper/output/
+highlight_scraper/highlights_output/
+clip_scraper/clips_output/
+highlight_scraper/highlights_output/
+clip_scraper/clips_output/
+highlight_scraper/highlights_output/
+
 # End of https://www.toptal.com/developers/gitignore/api/python,windows,macos
