@@ -258,3 +258,4 @@ if __name__ == "__main__":
         debug_auth_status()
     else:
         print("❌ Environment validation failed")
+        
