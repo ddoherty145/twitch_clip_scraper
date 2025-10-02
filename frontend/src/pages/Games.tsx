@@ -55,52 +55,52 @@ const Games: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-quaternary">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 md:mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-purple-600 p-3 rounded-lg">
-              <Gamepad2 className="h-8 w-8 text-white" />
+            <div className="bg-secondary p-3 rounded-lg">
+              <Gamepad2 className="h-6 w-6 md:h-8 md:w-8 text-quaternary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Game Categories</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">Game Categories</h1>
+          <p className="text-sm md:text-base text-primary max-w-2xl mx-auto px-4">
             Select a game category to discover the top clips from that game. 
             Perfect for finding trending moments and viral content from your favorite games.
           </p>
         </div>
 
         {/* Game Selection */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Choose a Game Category</h2>
+        <div className="bg-white rounded-lg shadow-sm border border-secondary p-6 mb-8">
+          <h2 className="text-xl font-semibold text-primary mb-4">Choose a Game Category</h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
             {popularGames.map((game) => (
               <button
                 key={game.id}
                 onClick={() => setSelectedGame(game.name)}
-                className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                className={`p-3 md:p-4 rounded-lg border-2 transition-colors text-left ${
                   selectedGame === game.name
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    ? 'border-secondary bg-secondary text-quaternary'
+                    : 'border-secondary hover:border-tertiary hover:bg-tertiary'
                 }`}
               >
-                <div className="font-medium text-sm">{game.name}</div>
+                <div className="font-medium text-sm md:text-base">{game.name}</div>
               </button>
             ))}
           </div>
 
           {selectedGame && (
-            <div className="bg-purple-50 p-4 rounded-lg mb-4">
+            <div className="bg-tertiary p-4 rounded-lg mb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-purple-900">Selected Game:</h3>
-                  <p className="text-purple-700">{selectedGame}</p>
+                  <h3 className="font-semibold text-primary">Selected Game:</h3>
+                  <p className="text-primary">{selectedGame}</p>
                 </div>
                 <button
                   onClick={() => setSelectedGame('')}
-                  className="text-purple-600 hover:text-purple-800"
+                  className="text-secondary hover:text-primary"
                 >
                   Change
                 </button>
@@ -112,11 +112,11 @@ const Games: React.FC = () => {
             <button
               onClick={handleScrapeGame}
               disabled={!selectedGame || isLoading}
-              className="bg-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+              className="bg-secondary text-quaternary py-3 px-6 rounded-lg font-medium hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-quaternary"></div>
                   <span>Scraping...</span>
                 </>
               ) : (
@@ -127,7 +127,7 @@ const Games: React.FC = () => {
               )}
             </button>
             
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-primary">
               <p>Will fetch up to 100 top clips from the last 24 hours</p>
             </div>
           </div>
@@ -141,57 +141,57 @@ const Games: React.FC = () => {
 
         {/* Game Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-            <div className="bg-blue-100 p-3 rounded-full w-fit mx-auto mb-3">
-              <Gamepad2 className="h-6 w-6 text-blue-600" />
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-secondary text-center">
+            <div className="bg-tertiary p-3 rounded-full w-fit mx-auto mb-3">
+              <Gamepad2 className="h-6 w-6 text-secondary" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">18+ Categories</h3>
-            <p className="text-gray-600">Popular game categories available</p>
+            <h3 className="text-lg font-semibold text-primary mb-1">18+ Categories</h3>
+            <p className="text-primary">Popular game categories available</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-            <div className="bg-green-100 p-3 rounded-full w-fit mx-auto mb-3">
-              <Eye className="h-6 w-6 text-green-600" />
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-secondary text-center">
+            <div className="bg-tertiary p-3 rounded-full w-fit mx-auto mb-3">
+              <Eye className="h-6 w-6 text-secondary" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">100 Clips</h3>
-            <p className="text-gray-600">Top clips per category</p>
+            <h3 className="text-lg font-semibold text-primary mb-1">100 Clips</h3>
+            <p className="text-primary">Top clips per category</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-            <div className="bg-purple-100 p-3 rounded-full w-fit mx-auto mb-3">
-              <Calendar className="h-6 w-6 text-purple-600" />
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-secondary text-center">
+            <div className="bg-tertiary p-3 rounded-full w-fit mx-auto mb-3">
+              <Calendar className="h-6 w-6 text-secondary" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">24 Hours</h3>
-            <p className="text-gray-600">Fresh content from today</p>
+            <h3 className="text-lg font-semibold text-primary mb-1">24 Hours</h3>
+            <p className="text-primary">Fresh content from today</p>
           </div>
         </div>
 
         {/* Clips Display */}
         {currentJobId && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
             <ClipGallery jobId={currentJobId} />
           </div>
         )}
 
         {/* Instructions */}
         {!currentJobId && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">How to Use</h2>
+          <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
+            <h2 className="text-xl font-semibold text-primary mb-4">How to Use</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">1</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Select Game</h3>
-                <p className="text-gray-600 text-sm">Choose from popular game categories like League of Legends, Fortnite, or Just Chatting.</p>
+                <div className="bg-secondary text-quaternary w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">1</div>
+                <h3 className="font-semibold text-primary mb-2">Select Game</h3>
+                <p className="text-primary text-sm">Choose from popular game categories like League of Legends, Fortnite, or Just Chatting.</p>
               </div>
               <div className="text-center">
-                <div className="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">2</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Start Scraping</h3>
-                <p className="text-gray-600 text-sm">Click "Get Top Clips" to fetch the most popular clips from the last 24 hours.</p>
+                <div className="bg-secondary text-quaternary w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">2</div>
+                <h3 className="font-semibold text-primary mb-2">Start Scraping</h3>
+                <p className="text-primary text-sm">Click "Get Top Clips" to fetch the most popular clips from the last 24 hours.</p>
               </div>
               <div className="text-center">
-                <div className="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">3</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Watch & Stream</h3>
-                <p className="text-gray-600 text-sm">Browse clips, use filters, and stream directly in your browser.</p>
+                <div className="bg-secondary text-quaternary w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">3</div>
+                <h3 className="font-semibold text-primary mb-2">Watch & Stream</h3>
+                <p className="text-primary text-sm">Browse clips, use filters, and stream directly in your browser.</p>
               </div>
             </div>
           </div>

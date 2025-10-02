@@ -54,26 +54,26 @@ const JobHistory: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-quaternary" />;
       case 'failed':
         return <XCircle className="h-4 w-4 text-red-500" />;
       case 'running':
-        return <Loader className="h-4 w-4 text-blue-500 animate-spin" />;
+        return <Loader className="h-4 w-4 text-quaternary animate-spin" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
+        return <Clock className="h-4 w-4 text-primary" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'text-green-600 bg-green-50';
+        return 'text-quaternary bg-tertiary';
       case 'failed':
         return 'text-red-600 bg-red-50';
       case 'running':
-        return 'text-blue-600 bg-blue-50';
+        return 'text-quaternary bg-tertiary';
       default:
-        return 'text-gray-600 bg-gray-50';
+        return 'text-primary bg-tertiary';
     }
   };
 
@@ -83,38 +83,38 @@ const JobHistory: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
         <div className="flex items-center justify-center h-32">
-          <Loader className="h-6 w-6 animate-spin text-purple-600" />
+          <Loader className="h-6 w-6 animate-spin text-secondary" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
       <div className="flex items-center space-x-2 mb-6">
-        <Clock className="h-5 w-5 text-purple-600" />
-        <h2 className="text-xl font-semibold text-gray-900">Job History</h2>
+        <Clock className="h-5 w-5 text-secondary" />
+        <h2 className="text-xl font-semibold text-primary">Job History</h2>
       </div>
 
       {jobs.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <Clock className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+        <div className="text-center py-8 text-primary">
+          <Clock className="h-12 w-12 mx-auto mb-4 text-tertiary" />
           <p>No scraping jobs yet</p>
           <p className="text-sm">Start a scraping job to see results here</p>
         </div>
       ) : (
         <div className="space-y-4">
           {jobs.map((job) => (
-            <div key={job.id} className="border border-gray-200 rounded-lg p-4">
+            <div key={job.id} className="border border-secondary rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(job.status)}
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
                     {job.status}
                   </span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-primary">
                     {job.job_type === 'top_clips' ? 'Top Clips' : 'Channel Highlights'}
                   </span>
                 </div>
@@ -122,7 +122,7 @@ const JobHistory: React.FC = () => {
                   {job.status === 'completed' && (
                     <button
                       onClick={() => handleViewClips(job.id)}
-                      className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
+                      className="p-1 text-primary hover:text-secondary transition-colors"
                       title="View clips"
                     >
                       <Play className="h-4 w-4" />
@@ -130,7 +130,7 @@ const JobHistory: React.FC = () => {
                   )}
                   <button
                     onClick={() => handleDeleteJob(job.id)}
-                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                    className="p-1 text-primary hover:text-red-600 transition-colors"
                     title="Delete job"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -140,13 +140,13 @@ const JobHistory: React.FC = () => {
 
               {job.status === 'running' && (
                 <div className="mb-3">
-                  <div className="flex justify-between text-sm text-gray-600 mb-1">
+                  <div className="flex justify-between text-sm text-primary mb-1">
                     <span>Progress</span>
                     <span>{job.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-tertiary rounded-full h-2">
                     <div
-                      className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-secondary h-2 rounded-full transition-all duration-300"
                       style={{ width: `${job.progress}%` }}
                     ></div>
                   </div>
@@ -154,7 +154,7 @@ const JobHistory: React.FC = () => {
               )}
 
               {job.result && (
-                <div className="text-sm text-gray-600 mb-2">
+                <div className="text-sm text-primary mb-2">
                   <p>Total clips: {job.result.total_clips}</p>
                   {job.result.game_breakdown && (
                     <p>Games: {Object.keys(job.result.game_breakdown).length}</p>
@@ -171,7 +171,7 @@ const JobHistory: React.FC = () => {
                 </div>
               )}
 
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-primary">
                 Started: {formatDate(job.created_at)}
                 {job.completed_at && (
                   <span> • Completed: {formatDate(job.completed_at)}</span>
@@ -180,7 +180,7 @@ const JobHistory: React.FC = () => {
               
               {/* Show ClipGallery when this job is selected */}
               {selectedJobId === job.id && job.status === 'completed' && (
-                <div className="mt-4 pt-4 border-t">
+                <div className="mt-4 pt-4 border-t border-secondary">
                   <ClipGallery jobId={job.id} />
                 </div>
               )}
