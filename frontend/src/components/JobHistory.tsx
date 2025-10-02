@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Download, Trash2, CheckCircle, XCircle, Loader } from 'lucide-react';
-import { getJobs, deleteJob, downloadResult } from '../services/api';
+import { Clock, Trash2, CheckCircle, XCircle, Loader, Play } from 'lucide-react';
+import { getJobs, deleteJob } from '../services/api';
+import ClipGallery from './ClipGallery';
 
 interface Job {
   id: number;
@@ -18,6 +19,7 @@ interface Job {
 const JobHistory: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchJobs();
@@ -45,20 +47,8 @@ const JobHistory: React.FC = () => {
     }
   };
 
-  const handleDownload = async (jobId: number) => {
-    try {
-      const blob = await downloadResult(jobId);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `twitch_clips_${jobId}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Failed to download:', error);
-    }
+  const handleViewClips = (jobId: number) => {
+    setSelectedJobId(selectedJobId === jobId ? null : jobId);
   };
 
   const getStatusIcon = (status: string) => {
@@ -131,11 +121,11 @@ const JobHistory: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   {job.status === 'completed' && (
                     <button
-                      onClick={() => handleDownload(job.id)}
+                      onClick={() => handleViewClips(job.id)}
                       className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
-                      title="Download Excel file"
+                      title="View clips"
                     >
-                      <Download className="h-4 w-4" />
+                      <Play className="h-4 w-4" />
                     </button>
                   )}
                   <button
@@ -187,6 +177,13 @@ const JobHistory: React.FC = () => {
                   <span> • Completed: {formatDate(job.completed_at)}</span>
                 )}
               </div>
+              
+              {/* Show ClipGallery when this job is selected */}
+              {selectedJobId === job.id && job.status === 'completed' && (
+                <div className="mt-4 pt-4 border-t">
+                  <ClipGallery jobId={job.id} />
+                </div>
+              )}
             </div>
           ))}
         </div>

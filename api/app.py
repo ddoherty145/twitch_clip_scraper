@@ -72,6 +72,7 @@ def run_top_clips_job(job):
         days_back = job.config.get('days_back', 1)
         limit = job.config.get('limit', 150)
         english_only = job.config.get('english_only', True)
+        game_filter = job.config.get('game_filter', None)
         
         job.progress = 30
         
@@ -81,7 +82,8 @@ def run_top_clips_job(job):
             days_back=days_back,
             limit=limit,
             strategy='mixed',
-            english_only=english_only
+            english_only=english_only,
+            game_filter=game_filter
         )
         
         job.progress = 80
@@ -91,15 +93,12 @@ def run_top_clips_job(job):
             job.error = 'No clips found for the specified period'
             return
         
-        # Generate Excel file
-        excel_file = create_clips_excel(clips)
-        job.progress = 90
-        
-        # Update job with results
+        # Update job with results (no Excel generation)
         job.status = 'completed'
         job.progress = 100
         job.result = {
             'total_clips': len(clips),
+            'clips': clips,  # Return all clips data
             'top_clip': clips[0] if clips else None,
             'game_breakdown': {}
         }
@@ -111,7 +110,6 @@ def run_top_clips_job(job):
             game_counts[game] = game_counts.get(game, 0) + 1
         
         job.result['game_breakdown'] = dict(sorted(game_counts.items(), key=lambda x: x[1], reverse=True))
-        job.output_file = excel_file
         job.completed_at = datetime.now()
         
     except Exception as e:
@@ -152,19 +150,26 @@ def run_channel_highlights_job(job):
             job.error = 'No highlights found for any channels'
             return
         
-        # Generate Excel file
-        excel_file = create_highlights_excel(highlights_data, channels, separate_sheets=True)
-        job.progress = 90
-        
-        # Update job with results
+        # Update job with results (no Excel generation)
         job.status = 'completed'
         job.progress = 100
+        
+        # Flatten all clips into a single list for display
+        all_clips = []
+        for channel, clips in highlights_data.items():
+            for clip in clips:
+                clip['channel_name'] = channel
+                all_clips.append(clip)
+        
+        # Sort by view count
+        all_clips.sort(key=lambda x: x.get('view_count', 0), reverse=True)
+        
         job.result = {
             'total_clips': total_clips,
+            'clips': all_clips,  # Return all clips data
             'channels': {channel: len(clips) for channel, clips in highlights_data.items()},
             'highlights_data': highlights_data
         }
-        job.output_file = excel_file
         job.completed_at = datetime.now()
         
     except Exception as e:
@@ -291,35 +296,29 @@ def list_jobs():
     jobs = [job.to_dict() for job in scraping_jobs.values()]
     return jsonify({'jobs': jobs})
 
-@app.route('/api/jobs/<int:job_id>/download', methods=['GET'])
-def download_result(job_id):
-    """Download the Excel file result"""
+@app.route('/api/jobs/<int:job_id>/clips', methods=['GET'])
+def get_job_clips(job_id):
+    """Get clips data from a completed job"""
     if job_id not in scraping_jobs:
         return jsonify({'error': 'Job not found'}), 404
     
     job = scraping_jobs[job_id]
-    if job.status != 'completed' or not job.output_file:
-        return jsonify({'error': 'Job not completed or no output file'}), 400
+    if job.status != 'completed' or not job.result:
+        return jsonify({'error': 'Job not completed or no results available'}), 400
     
-    if not os.path.exists(job.output_file):
-        return jsonify({'error': 'Output file not found'}), 404
-    
-    return send_file(job.output_file, as_attachment=True)
+    return jsonify({
+        'job_id': job_id,
+        'clips': job.result.get('clips', []),
+        'total_clips': job.result.get('total_clips', 0),
+        'game_breakdown': job.result.get('game_breakdown', {}),
+        'channels': job.result.get('channels', {})
+    })
 
 @app.route('/api/jobs/<int:job_id>', methods=['DELETE'])
 def delete_job(job_id):
     """Delete a job"""
     if job_id not in scraping_jobs:
         return jsonify({'error': 'Job not found'}), 404
-    
-    job = scraping_jobs[job_id]
-    
-    # Clean up output file if it exists
-    if job.output_file and os.path.exists(job.output_file):
-        try:
-            os.remove(job.output_file)
-        except:
-            pass  # Ignore cleanup errors
     
     del scraping_jobs[job_id]
     return jsonify({'message': 'Job deleted'})

@@ -232,7 +232,7 @@ def get_clips_by_game(token, game_name, days_back=1, limit=50, english_only=True
         print(f"⚠️ Exception fetching clips for {game_name}: {e}")
         return []
 
-def get_top_clips(token, days_back=1, limit=150, strategy='mixed', english_only=True):
+def get_top_clips(token, days_back=1, limit=150, strategy='mixed', english_only=True, game_filter=None):
     """
     Get top clips from multiple popular games
     
@@ -273,6 +273,20 @@ def get_top_clips(token, days_back=1, limit=150, strategy='mixed', english_only=
         'Minecraft',       # Horror multiplayer
         'Animals, Aquariums, and Zoos'               # Party game
     ]
+    
+    # If game_filter is specified, only scrape that game
+    if game_filter:
+        print(f"🎯 Using Single Game Strategy: {game_filter}")
+        print(f"🌍 Language Filter: {'English Only' if english_only else 'All Languages'}")
+        print(f"⏰ Looking for clips from the last {days_back} day(s)")
+        
+        clips = get_clips_by_game(token, game_filter, days_back, limit, english_only)
+        if clips:
+            # Sort by view count
+            sorted_clips = sorted(clips, key=lambda x: x.get('view_count', 0), reverse=True)
+            return sorted_clips[:limit]
+        else:
+            return []
     
     print(f"🎯 Using Multiple Games Strategy")
     print(f"🌍 Language Filter: {'English Only' if english_only else 'All Languages'}")

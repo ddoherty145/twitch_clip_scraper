@@ -1,24 +1,25 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Header from './components/Header';
-import ScrapingInterface from './components/ScrapingInterface';
-import JobHistory from './components/JobHistory';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Games from './pages/Games';
+import Highlights from './pages/Highlights';
+import About from './pages/About';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="lg:col-span-1">
-            <ScrapingInterface />
-          </div>
-          <div className="lg:col-span-1">
-            <JobHistory />
-          </div>
-        </div>
-      </main>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/highlights" element={<Highlights />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

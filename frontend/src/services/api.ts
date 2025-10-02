@@ -52,6 +52,7 @@ export const scrapeTopClips = async (config: {
   days_back: number;
   limit: number;
   english_only: boolean;
+  game_filter?: string;
 }) => {
   const response = await api.post('/scrape/top-clips', config);
   return response.data;
@@ -79,11 +80,9 @@ export const getJobs = async () => {
   return response.data;
 };
 
-// Download job result
-export const downloadResult = async (jobId: number) => {
-  const response = await api.get(`/jobs/${jobId}/download`, {
-    responseType: 'blob',
-  });
+// Get clips from a completed job
+export const getJobClips = async (jobId: number) => {
+  const response = await api.get(`/jobs/${jobId}/clips`);
   return response.data;
 };
 
