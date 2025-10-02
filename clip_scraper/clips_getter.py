@@ -268,7 +268,7 @@ def get_top_clips(token, days_back=1, limit=150, strategy='mixed', english_only=
         
         # Trending games (adjust based on current meta)
         'Peak',                 # MOBA alternative
-        'Hollow Knight',            # Hero shooter
+        'Path of Exile 2',            # Hero shooter
         'Marvel Rivals',          # Esports favorite
         'Minecraft',       # Horror multiplayer
         'Animals, Aquariums, and Zoos'               # Party game

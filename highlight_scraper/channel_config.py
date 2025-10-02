@@ -12,7 +12,17 @@ GAMING_CHANNELS = [
     "peterpark",
     "drxx",
     "kkatamina",
-    "captainsparklez"
+    "captainsparklez",
+    "sykkuno",
+    "abe",
+    "yoojin",
+    "valkyrae",
+    "blau",
+    "xchocobars",
+    "itsryanhiga",
+    "ellum",
+    "kyacolosseum"
+
 ]
 
 # Just Chatting / Variety Channels
@@ -27,7 +37,8 @@ VARIETY_CHANNELS = [
     "agent00",
     "39daph",
     "emiru",
-    "misterarther"
+    "misterarther",
+    "kaicenat"
 ]
 
 # Competitive Gaming
@@ -77,13 +88,13 @@ DEFAULT_CONFIG = {
 # Preset configurations
 PRESETS = {
     "gaming": {
-        "channels": GAMING_CHANNELS[:11],
+        "channels": GAMING_CHANNELS[:20],
         "days_back": 1,
         "clips_per_channel": 30,
         "separate_sheets": True
     },
     "variety": {
-        "channels": VARIETY_CHANNELS[:11],
+        "channels": VARIETY_CHANNELS[:12],
         "days_back": 1,
         "clips_per_channel": 30,
         "separate_sheets": True

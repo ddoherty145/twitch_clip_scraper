@@ -22,7 +22,7 @@ def get_user_id(token, username):
     except Exception as e:
         raise Exception(f"Error getting user ID: {e}")
 
-def get_channel_clips(token, channel_names, days_back=1, limit=150):
+def get_channel_clips(token, channel_names, days_back=2, limit=150):
     """Fetch clips from specific channels"""
     
     # Calculate date range
